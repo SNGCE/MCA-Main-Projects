@@ -1,0 +1,370 @@
+
+:root {
+  --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --msger-bg: #fff;
+  --border: 2px solid #ddd;
+  --left-msg-bg: #000000; /* Light gray for bot messages */
+  --right-msg-bg: #11bead; /* Blue for user messages */
+  --header-bg: #000; /* Black header background */
+  --header-text-color: #fff; /* White text in header */
+  --text-color: #fcf3f3; /* Light text */
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: var(--body-bg);
+  font-family: Helvetica, sans-serif;
+}
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #000000;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.sidebar h2 {
+  font-size: 24px;
+  text-align: center;
+}
+
+.sidebar img {
+  width: 50px;
+  height: 50px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.login {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.login button {
+  padding: 5px 10px;
+  background-color: #010108;
+  color: rgb(19, 185, 172);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login button:hover {
+  background-color: rgb(19, 185, 172);
+  color: #010108;
+}
+
+#previous-chats {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.chat-item {
+  padding: 5px;
+  border-bottom: 1px solid #444;
+}
+
+.chat-item:last-child {
+  border-bottom: none;
+}
+
+.msger {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 867px;
+  margin: 25px 10px;
+  height: 90vh;
+  border: var(--border);
+  border-radius: 5px;
+  background: var(--msger-bg);
+  box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
+}
+
+.msger-header {
+  font-size: medium;
+  text-align: center;
+  padding: 10px;
+  border-bottom: var(--border);
+  background: var(--header-bg);
+  color: var(--header-text-color);
+}
+
+.msger-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: #d8bfd8;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.msger-chat::-webkit-scrollbar {
+  width: 6px;
+}
+
+.msger-chat::-webkit-scrollbar-track {
+  background: #ddd;
+}
+
+.msger-chat::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+}
+
+.msg {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.msg-img {
+  width: 50px;
+  height: 50px;
+  background: #ddd;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+}
+
+.msg-bubble {
+  max-width: 450px;
+  padding: 15px;
+  border-radius: 15px;
+  background: var(--left-msg-bg);
+  color: var(--text-color);
+}
+
+.right-msg {
+  flex-direction: row-reverse;
+}
+
+.right-msg .msg-bubble {
+  background: var(--right-msg-bg);
+  color: #fff;
+  border-bottom-right-radius: 0;
+}
+
+.msger-inputarea {
+  display: flex;
+  padding: 10px;
+  border-top: var(--border);
+  background: #000000;
+}
+
+.msger-input {
+  flex: 1;
+  background: #ddd;
+  border-radius: 3px;
+  font-size: 1em;
+  padding: 10px;
+}
+
+.msger-send-btn,
+.msger-voice-btn {
+  background: black;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 5px;
+}
+
+.msger-send-btn img,
+.msger-voice-btn img {
+  width: 30px;
+  height: 30px;
+}
+
+.msger-send-btn:hover,
+.msger-voice-btn:hover {
+  transform: scale(1.1);
+}
+
+.mood-chart-container {
+  width: 200px;  /* Reduce width to be smaller */
+  margin: 10px auto; 
+  background: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center;  /* Center align */
+  gap: 10px;
+  height: 400px;  /* Adjust as needed */
+  overflow: hidden; /* Prevents it from extending too far */
+  margin-bottom: 20px; /* Adds space below the chart */
+}
+
+#moodChart {
+  width: 100% !important;  /* Fit inside container */
+  height: 50% !important; /* Reduce height further */
+}
+.emotion-panel {
+  width: 250px;
+  padding: 10px;
+  background: black;
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+  margin: 10px auto;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+#emotion-container {
+  display: flex;
+  flex-direction: column;  /* Stack elements in a single column */
+  align-items: center;  /* Center align */
+  gap: 10px;  /* Add spacing between panels */
+  margin: 10px auto;
+}
+
+.emotion-panel video {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+#current-emotion {
+  font-size: 16px;
+  font-weight: bold;
+  color: #11bead;
+}
+#video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+#video-feed {
+  width: 100%;  /* Reduce width */
+  height: 50%; /* Reduce height */
+  border: 2px solid black;
+  border-radius: 10px;
+}
+.music-panel {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 150px;
+  padding: 20px;
+  background-color: #000000;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  z-index: 1000;
+  padding: 20px;
+}
+
+.music-panel h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+#audio-player {
+  width: 100%;
+  max-width: 150px;
+  margin: 20px auto;
+  display: block;
+  outline: none;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.music-panel button {
+  margin-top: 10px;
+  background-color: #87cefa;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.popup {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 250px;
+  background: #000000;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.popup.hide {
+  opacity: 0;
+}
+
+
+.popup h3 {
+  margin-top: 0;
+}
+
+.popup .stars span {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.popup textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  resize: none;
+}
+
+.popup button {
+  margin-top: 10px;
+  padding: 8px;
+  background: #040489;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.about-link {
+  font-size: 24px;
+  text-decoration: none;
+  color: #555;
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+
+.about-link:hover {
+  color: #007bff;
+}
+
+#clear-history-btn {
+  background-color: #ff6961;
+  color: white;
+  padding: 6px 12px;
+  margin: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

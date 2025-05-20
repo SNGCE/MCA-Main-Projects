@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Feedback | Chat-Fie</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8f8;
+      padding: 0;
+      margin: 0;
+    }
+    .feedback-container {
+      width: 90%;
+      margin: 40px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #009b9b;
+    }
+    a {
+      text-decoration: none;
+      color: white;
+      background-color: #007a7a;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #009b9b;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="feedback-container">
+    <h1>📋 User Feedback & Ratings</h1>
+    <a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
+    <hr>
+
+    {% if feedback %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User ID</th>
+          <th>Message ID</th>
+          <th>Rating</th>
+          <th>Feedback</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fb in feedback %}
+        <tr>
+          <td>{{ fb.id }}</td>
+          <td>{{ fb.user_id }}</td>
+          <td>{{ fb.message_id or 'N/A' }}</td>
+          <td>{{ fb.rating }}</td>
+          <td>{{ fb.feedback }}</td>
+          <td>{{ fb.timestamp }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No feedback submitted yet.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

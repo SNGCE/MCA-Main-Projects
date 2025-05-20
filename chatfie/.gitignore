@@ -1,0 +1,19 @@
+# Ignore .env file that contains sensitive data
+.env
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore system files
+.DS_Store
+
+# Ignore other files
+*.log
+
+# Ignore virtual environments
+venv/
+
+# Ignore large music files
+static/music/*.mp3

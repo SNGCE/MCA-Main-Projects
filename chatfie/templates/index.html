@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat-Fie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- For Mood Chart -->
+</head>
+<body>
+    <div class="sidebar">
+        <a href="{{ url_for('about') }}" title="About Chat-Fie" class="about-link">
+             ?
+        </a>
+        <img src="{{ url_for('static', filename='chatfie2.jpeg') }}" alt="Chat-Fie logo">
+        <h2>Chat-Fie</h2>
+        <h3>Previous Chats</h3>
+        <div class="previous-chats">
+            <div id="previous-chats-list">
+                <!-- Chat messages will be loaded here -->
+            </div>
+        </div>
+        <div class="login">
+            {% if session["user_id"] %}
+                <a href="{{ url_for('profile') }}" id="profile-link">
+                    Welcome, {{ session["username"] }}!
+                </a>
+            {% else %}
+                <button id="login-btn" onclick="window.location.href='{{ url_for('login') }}'">Login</button>
+            {% endif %}
+        </div>
+        <div id="music-player" class="music-panel">
+            <h3>Soothing Music</h3>
+            <audio id="audio-player" controls>
+                <source src="static/music/relax1.mp3" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+            <button onclick="nextTrack()">Next</button>
+        </div>
+        <button id="login-btn" onclick="clearChatHistory()">🧹 Clear History</button>
+        <button id="login-btn" onclick="window.location.href='{{ url_for('feedback_page') }}'">Feedback</button>
+    </div>
+    <section class="msger">
+        <header class="msger-header">
+            <div class="msger-header-title">
+                <i>Chat-Fie - Wellbeing through Technology</i>
+            </div>
+        </header>
+        <main class="msger-chat" style="background-image: url('{{ url_for('static', filename='bgimage.jpeg') }}');">
+            <div class="msg left-msg">
+                <div class="msg-img" style="background-image: url('{{ url_for('static', filename='chatfie2.jpeg') }}');"></div>
+                <div class="msg-bubble">
+                    <div class="msg-info">
+                        <div class="msg-info-name">Chat-Fie</div>
+                        <div class="msg-info-time" id="time-display"></div>
+                    </div>
+                    <div class="msg-text">
+                        Hi! I am Chat-Fie! How about we begin with our session. How's life? 😄
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div class="msger-inputarea">
+            <input type="text" class="msger-input" id="user-input" placeholder="Type your message here..." />
+            <button class="msger-send-btn" id="send-btn">
+                <img src="{{ url_for('static', filename='send.png') }}" alt="Send">
+            </button>
+            <button class="msger-voice-btn" id="voice-btn">
+                <img src="{{ url_for('static', filename='microphone.png') }}" alt="Voice">
+            </button>
+        </div>
+    </section>
+<div id="emotion-container">    
+    <div class="mood-chart-container">
+        <h2>Select Date for Mood Chart</h2>
+        <label for="mood-date">Choose a Date:</label>
+        <input type="date" id="mood-date" name="mood-date">
+        
+        <label for="mood-range">Choose a Date Range:</label>
+        <input type="date" id="mood-start" name="mood-start">
+        <input type="date" id="mood-end" name="mood-end">
+        
+        <button onclick="updateMoodChart()">Show Mood Data</button>
+        
+        <canvas id="moodChart"></canvas>
+
+    </div>
+    
+    <div class="emotion-panel">
+        <h3>Real-Time Emotion Detection</h3>
+        <div id="video-container">
+            <img id="video-feed" src="{{ url_for('video_feed') }}">
+        </div>
+    </div>
+</div>
+<script>
+    const msgerInput = document.getElementById("user-input");
+    const msgerChat = document.querySelector(".msger-chat");
+    const BOT_IMG = "{{ url_for('static', filename='chatfie2.jpeg') }}";
+    const PERSON_IMG = "{{ url_for('static', filename='you.jpeg') }}";
+    const BOT_NAME = "Chat-Fie";
+    const PERSON_NAME = "You";
+    let moodChartInstance = null;
+
+    // =========================
+    // UTILITY FUNCTIONS
+    // =========================
+
+    function escapeHTML(text) {
+        return text.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag]));
+    }
+
+    function speakText(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function appendMessage(name, img, side, text) {
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgHTML = `
+            <div class="msg ${side}-msg">
+                <div class="msg-img" style="background-image: url(${img})"></div>
+                <div class="msg-bubble">
+                    <div class="msg-info">
+                        <div class="msg-info-name">${name}</div>
+                        <div class="msg-info-time">${time}</div>
+                    </div>
+                    <div class="msg-text">${escapeHTML(text)}</div>
+                </div>
+            </div>`;
+        msgerChat.insertAdjacentHTML("beforeend", msgHTML);
+        msgerChat.scrollTop = msgerChat.scrollHeight;
+    }
+
+    function startVoiceRecognition() {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.start();
+
+        recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            msgerInput.value = transcript;
+            sendMessage();
+        };
+
+        recognition.onerror = function (event) {
+            console.error("Speech recognition error:", event.error);
+        };
+    }
+
+    function saveChat(userMessage, botResponse) {
+    const userId = localStorage.getItem("user_id");  // Must be set at login
+
+    if (!userId) {
+        alert("Please log in to save chat!");
+        window.location.href = "/login";
+        return;
+    }
+
+    fetch("/save_chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            user_id: userId,
+            message: userMessage,
+            response: botResponse
+        })
+    })
+    .then(response => {
+        if (response.status === 403) {
+            alert("Please log in to save chat!");
+            window.location.href = "/login";
+        } else if (response.ok) {
+            console.log("Chat saved successfully!");
+        } else {
+            console.error("Error saving chat:", response.statusText);
+        }
+    })
+    .catch(error => console.log("Error saving chat:", error));
+}
+
+
+    msgerInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+    document.getElementById("send-btn").addEventListener("click", sendMessage);
+    document.getElementById("voice-btn").addEventListener("click", startVoiceRecognition);
+
+    function sendMessage() {
+    const text = msgerInput.value.trim();
+    if (!text) return;
+
+    fetch("/check_login")
+        .then(response => response.json())
+        .then(data => {
+            if (!data.logged_in) {
+                alert("⚠️ You must log in to save chat history!");
+                window.location.href = "/login";
+                return;
+            }
+
+            // Append user message
+            appendMessage(PERSON_NAME, PERSON_IMG, "right", text);
+            msgerInput.value = "";
+
+            // Show "Typing..." message from bot
+            appendMessage(BOT_NAME, BOT_IMG, "left", "Typing...");
+            const lastBotMsg = msgerChat.querySelector(".msg.left-msg:last-child .msg-text");
+
+            // Get bot response
+            $.get("/get", { msg: text })
+                .done(function (data) {
+                    lastBotMsg.innerHTML = escapeHTML(data.response); // replace "Typing..." with real response
+                    speakText(data.response);
+                    saveChat(text, data.response);
+                })
+                .fail(function () {
+                    lastBotMsg.innerHTML = "Sorry, I couldn't process that. Please try again.";
+                });
+        })
+        .catch(error => {
+            console.error("Error checking login status:", error);
+        });
+}
+
+    socket.on('bot_message', function(data) {
+    const chatBox = document.querySelector(".msger-chat");
+    const botMsg = document.createElement("div");
+    botMsg.classList.add("bot-message");
+    botMsg.innerHTML = `<p>${data.msg}</p>`;
+    chatBox.appendChild(botMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    fetchChatSessions();
+});
+
+function loadChat(chat) {
+    const chatWindow = document.querySelector(".msger-chat");
+    chatWindow.innerHTML = `
+        <div class="msg left-msg">
+            <div class="msg-bubble">${chat.user_message}</div>
+        </div>
+        <div class="msg right-msg">
+            <div class="msg-bubble">${chat.bot_response}</div>
+        </div>
+    `;
+}s
+function fetchPreviousChats() {
+    fetch("/get_previous_chats")
+        .then(response => response.json())
+        .then(data => {
+            const chatList = document.getElementById("previous-chats-list");
+            chatList.innerHTML = "";  // Clear previous list
+
+            if (data.error) {
+                chatList.innerHTML = "<li>No chats available.</li>";
+                return;
+            }
+
+            data.forEach(chat => {
+                let chatItem = document.createElement("li");
+                chatItem.textContent = `${chat.timestamp}: ${chat.user_message}`;
+                chatItem.onclick = () => loadChat(chat);
+                chatList.appendChild(chatItem);
+            });
+        })
+        .catch(error => console.error("Error fetching chats:", error));
+}
+document.addEventListener("DOMContentLoaded", fetchPreviousChats);
+
+   
+    function formatDateToDDMMYYYY(dateStr) {
+    const [year, month, day] = dateStr.split("-");
+    return `${day}-${month}-${year}`;
+}
+
+async function updateMoodChart() {
+    const selectedDate = document.getElementById("mood-date").value;
+    const startDate = document.getElementById("mood-start").value;
+    const endDate = document.getElementById("mood-end").value;
+
+    let url = "/get_mood_data";
+    if (startDate && endDate) {
+        const startdate = formatDateToDDMMYYYY(startDate);
+        const enddate = formatDateToDDMMYYYY(endDate);
+        url += `?start_date=${startdate}&end_date=${enddate}`;
+    } else if (selectedDate) {
+        const formattedDate = formatDateToDDMMYYYY(selectedDate);
+        url += `?date=${formattedDate}`;
+    }
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        console.log("Mood Data Received:", data);  // Optional debug log
+
+        if (!data || Object.keys(data).length === 0 || data.error) {
+            if (moodChartInstance) moodChartInstance.destroy();
+            alert(data.error || "No mood data found for the selected date(s).");
+            return;
+        }
+
+        const labels = Object.keys(data);
+        const values = Object.values(data);
+
+        const ctx = document.getElementById("moodChart").getContext("2d");
+        if (moodChartInstance) moodChartInstance.destroy();
+
+        moodChartInstance = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Mood Frequency",
+                    data: values,
+                    backgroundColor: ["#ff9999", "#66b3ff", "#99ff99", "#ffcc99", "#c2c2f0"],
+                    borderColor: "#333",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { font: { size: 10 } }
+                    },
+                    x: {
+                        ticks: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Error fetching mood data:", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", updateMoodChart);
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchChatSessions();
+        document.getElementById("time-display").textContent =
+            new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        document.getElementById("mood-date").addEventListener("change", updateMoodChart);
+        document.getElementById("mood-start").addEventListener("change", updateMoodChart);
+        document.getElementById("mood-end").addEventListener("change", updateMoodChart);
+    });
+
+    msgerInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    document.getElementById("send-btn").addEventListener("click", sendMessage);
+    document.getElementById("voice-btn").addEventListener("click", startVoiceRecognition);
+
+    const musicTracks = [
+    "static/music/relax1.mp3",
+    "static/music/relax2.mp3",
+    "static/music/relax3.mp3"
+    ];
+
+    let currentTrack = 0;
+
+    function nextTrack() {
+    currentTrack = (currentTrack + 1) % musicTracks.length;
+    const player = document.getElementById("audio-player");
+    player.src = musicTracks[currentTrack];
+    player.play();
+    }
+
+    function clearChatHistory() {
+        if (!confirm("Are you sure you want to clear your chat history?")) return;
+
+        fetch('/clear_chat_history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                const chatArea = document.getElementById("chat-messages");
+                chatArea.innerHTML = '';
+                alert("Chat history cleared.");
+            } else {
+                alert("Error: " + result.message);
+            }
+        })
+        .catch(error => console.error("Error clearing history:", error));
+    }
+
+</script>
+
+</body>
+</html>

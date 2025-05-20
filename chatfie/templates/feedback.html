@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Feedback</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #f7f7f7;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #feedback-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .stars span {
+            font-size: 3rem;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .stars .shining {
+            animation: shine 0.6s ease-out;
+        }
+
+        @keyframes shine {
+            0% { transform: scale(1); color: gold; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+
+        button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .hide {
+            animation: fadeOut 0.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="feedback-container">
+    <h2>We value your feedback</h2>
+
+    <div class="stars">
+        <span onclick="rate(1)">★</span>
+        <span onclick="rate(2)">★</span>
+        <span onclick="rate(3)">★</span>
+        <span onclick="rate(4)">★</span>
+        <span onclick="rate(5)">★</span>
+    </div>
+
+    <textarea id="feedback-text" rows="4" placeholder="Write your comment here..."></textarea>
+
+    <button onclick="submitFeedback()">Submit Feedback</button>
+</div>
+
+<script>
+let selectedRating = 0;
+
+function rate(stars) {
+    selectedRating = stars;
+    const spans = document.querySelectorAll('.stars span');
+    spans.forEach((s, i) => {
+        s.style.color = i < stars ? 'gold' : 'black';
+        if (i < stars) {
+            s.classList.add("shining");
+            setTimeout(() => s.classList.remove("shining"), 600);
+        } else {
+            s.classList.remove("shining");
+        }
+    });
+}
+
+function submitFeedback() {
+    const comment = document.getElementById("feedback-text").value.trim();
+    const timestamp = new Date().toISOString();
+
+    if (selectedRating === 0) {
+        alert("Please select a rating.");
+        return;
+    }
+
+    fetch('/submit_feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            rating: selectedRating,
+            comment: comment,
+            timestamp: timestamp
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Thank you for your feedback!");
+            window.location.href = "/";
+        } else if (data.error === 'User not logged in') {
+            alert("Please log in first.");
+            window.location.href = "/login";
+        } else {
+            alert("Error submitting feedback. Try again.");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Network error. Try again later.");
+    });
+}
+</script>
+
+</body>
+</html>

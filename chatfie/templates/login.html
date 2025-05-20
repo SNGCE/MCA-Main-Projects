@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Chat-Fie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <img src="{{ url_for('static', filename='chatfie2.jpeg') }}" alt="Chat-Fie Logo" class="logo">
+        <h1>Chat-Fie</h1>
+        <h4>Login to Chat-Fie</h4>
+        
+        <form method="POST" action="{{ url_for('login') }}">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>\   
+
+        <p>Or</p>
+        <button class="google-login-btn" onclick="window.location.href='{{ url_for('login_google') }}'">Login with Google</button>
+
+
+        <p>Not registered? <a href="{{ url_for('register') }}">Register here</a></p>
+    </div>
+    <script>
+        const USER_ID = {{ session['user_id'] if 'user_id' in session else 'null' }};
+        if (USER_ID !== null) {
+          localStorage.setItem("user_id", USER_ID);
+        }
+    </script>
+      
+</body>
+</html>
+

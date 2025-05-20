@@ -1,0 +1,17 @@
+.about-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 40px;
+    font-family: sans-serif;
+    background: #f9f9f9;
+    border-radius: 20px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+  }
+  .about-container h1, h2 {
+    color: #333;
+  }
+  .about-container a {
+    color: #0077cc;
+    text-decoration: none;
+  }
+  
