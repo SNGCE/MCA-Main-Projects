@@ -1,0 +1,77 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #ffffff;
+}
+
+.login-container {
+    text-align: center;
+    background: rgb(0, 0, 0);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+.logo {
+    width: 100px;
+    
+}
+
+.input-container {
+    width: 100%; /* Ensures both input and button containers take full width */
+    max-width: 200px; /* Adjust as needed */
+    margin: auto; /* Centers the form */
+}
+
+
+input{
+    display: block;
+    width: 280px;
+    padding: 10px;  /* Increase padding for a balanced look */
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px; /* Ensures text inside inputs and buttons look consistent */
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;  /* Increase padding for a balanced look */
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #11bead;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0ea69d;
+}
+
+.google-login-btn {
+    background: #db4437;
+    color: white;
+}
+
+p {
+    margin: 10px 0;
+    color: white; /* Sets text color to white */
+    font-size: 16px; /* Adjust size if needed */
+}
+h1 {
+    margin: 10px 0;
+    color: white;
+    margin-bottom: 20px;
+}
+h4 {
+    margin: 10px 0;
+    color: white;
+    margin-bottom: 20px;
+}

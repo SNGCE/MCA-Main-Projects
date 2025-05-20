@@ -1,0 +1,91 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Chat-Fie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f7f7;
+            padding: 40px;
+        }
+
+        .admin-container {
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #007777;
+            margin-bottom: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+            color: #006060;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #00aaaa;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #008888;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>🧠 Admin Dashboard - Chat-Fie</h1>
+
+        <a href="{{ url_for('view_feedback') }}">📊 View Feedback/Ratings</a>
+        <a href="{{ url_for('admin_logout') }}">🔒 Logout</a>
+
+        <hr>
+        <h2>Add New Intent</h2>
+        <form action="{{ url_for('add_intent') }}" method="POST">
+            <label>Tag:</label>
+            <input type="text" name="tag" required>
+
+            <label>Patterns (comma separated):</label>
+            <textarea name="patterns" rows="3" required></textarea>
+
+            <label>Responses (comma separated):</label>
+            <textarea name="responses" rows="3" required></textarea>
+
+            <button type="submit">➕ Add Intent</button>
+        </form>
+    </div>
+</body>
+</html>
